@@ -1,0 +1,27 @@
+name: Daily Study Bot
+
+on:
+  schedule:
+    - cron: '0 4 * * *'  # 9:30 AM IST daily
+  workflow_dispatch:
+
+jobs:
+  send-daily-schedule:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests python-telegram-bot
+
+      - name: Run bot
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: python bot.py
