@@ -152,6 +152,52 @@ def build_daily_message(topics):
     return "\n".join(msg)
 
 # ─────────────────────────────────────────
+# EVENING REMINDER MESSAGE
+# ─────────────────────────────────────────
+def build_evening_message(topics):
+    current_day  = get_current_day()
+    current_week = get_week_number(current_day)
+    week_label   = f"Week {current_week}"
+
+    today_row   = next((t for t in topics if t.get("Day", "").strip() == str(current_day)), None)
+    week_topics = [t for t in topics if t.get("Week", "").strip() == week_label]
+    done_topics = [t for t in week_topics if t.get("Status", "").strip().lower() == "done"]
+    bar, percent = progress_bar(len(done_topics), len(week_topics))
+    today_done  = today_row and today_row.get("Status", "").strip().lower() == "done"
+
+    msg = []
+    msg.append(f"🌙 *Evening Check-in — Day {current_day} of 45*")
+    msg.append(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    msg.append(f"")
+
+    if today_row:
+        topic = today_row.get("Topic", "—")
+        if today_done:
+            msg.append(f"✅ *Today\'s topic is marked Done — great work!*")
+            msg.append(f"   _{topic}_")
+        else:
+            msg.append(f"⚠️ *Today\'s topic is still Pending:*")
+            msg.append(f"   _{topic}_")
+            msg.append(f"")
+            msg.append(f"Please update your Google Sheet if you completed it today.")
+    msg.append(f"")
+    msg.append(f"📊 *{week_label} Progress:* {bar}  {percent}%")
+    msg.append(f"   {len(done_topics)} of {len(week_topics)} topics completed this week")
+    msg.append(f"")
+    msg.append(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    msg.append(f"📝 *End of Day Checklist:*")
+    msg.append(f"")
+    msg.append(f"  ☐  Mark today\'s topic as Done in Google Sheet")
+    msg.append(f"  ☐  Note down 1 thing you learned today")
+    msg.append(f"  ☐  Check if any job applications need follow-up")
+    msg.append(f"  ☐  Prep for tomorrow — Day {min(current_day + 1, 45)}")
+    msg.append(f"")
+    msg.append(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    msg.append(f"_Rest well. Tomorrow\'s morning briefing arrives at 9:30 AM._ 🌅")
+
+    return "\n".join(msg)
+
+# ─────────────────────────────────────────
 # SEND TO TELEGRAM
 # ─────────────────────────────────────────
 async def send_message(text):
@@ -164,15 +210,23 @@ async def send_message(text):
     print("✅ Message sent successfully!")
 
 # ─────────────────────────────────────────
-# MAIN
+# MAIN — mode: morning or evening
 # ─────────────────────────────────────────
 async def main():
+    import sys
+    mode = sys.argv[1] if len(sys.argv) > 1 else "morning"
+
     print("📊 Fetching data from Google Sheet...")
     topics = fetch_topics()
     print(f"✅ {len(topics)} topics loaded")
 
-    print("📝 Building today's message...")
-    message = build_daily_message(topics)
+    if mode == "evening":
+        print("🌙 Building evening reminder...")
+        message = build_evening_message(topics)
+    else:
+        print("🌅 Building morning briefing...")
+        message = build_daily_message(topics)
+
     print("\n--- MESSAGE PREVIEW ---")
     print(message)
     print("─────────────────────\n")
