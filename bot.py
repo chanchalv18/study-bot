@@ -12,7 +12,7 @@ from telegram import Bot
 TELEGRAM_TOKEN  = os.environ.get("TELEGRAM_TOKEN")   # Set in GitHub Secrets
 CHAT_ID         = os.environ.get("CHAT_ID")           # Set in GitHub Secrets
 SHEET_ID        = "1qrcfO4ClkqAsLKYb5X2TfjoiS4w1xfTc2-Aa7wKSPt0"
-PLAN_START_DATE = date(2026, 3, 24)  # Update this to your actual start date
+PLAN_START_DATE = date(2026, 4, 5)  # Update this to your actual start date
 IST = timezone(timedelta(hours=5, minutes=30))  # IST = UTC + 5:30
 
 # ─────────────────────────────────────────
